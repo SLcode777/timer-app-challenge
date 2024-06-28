@@ -1,5 +1,5 @@
 import { SetTimer } from "@/components/set-timer.jsx";
-import { Timer } from "@/components/timer.jsx";
+import TimerComponent from "@/components/timer";
 
 export default function Home() {
   return (
@@ -13,7 +13,7 @@ export default function Home() {
         <SetTimer />
       </section>
       <section className="mt-10">
-        <Timer/>
+      
       </section>
     </main>
   );

@@ -1,31 +1,47 @@
 "use client";
 
 import { SetTimerBox } from "./set-timer-box.jsx";
+import TimerComponent from "./timer";
+import useTimersStore from "@/utils/timers-store";
 
 export function SetTimer() {
-  const handleFocus = (event) => {
-    event.target.select();
-  };
+  const { duration, setHours, setMinutes, setSeconds } = useTimersStore();
 
   return (
     <>
       <div className="flex flex-col">
         <div className="flex flex-row gap-2 ">
-          <SetTimerBox min="00" max="99" tag="hrs" />
+          <SetTimerBox
+            min="00"
+            max="23"
+            tag="hrs"
+            value={duration.hours}
+            onChange={(value)=> setHours(Number(value))}
+          />
 
           <div className="flex flex-row items-center">
             <p className="text-stone-400">:</p>
           </div>
-          <SetTimerBox value="00" min="00" max="60" tag="min" />
+          <SetTimerBox
+            min="00"
+            max="60"
+            tag="min"
+            value={duration.minutes}
+            onChange={(value)=> setMinutes(Number(value))}
+          />
 
           <div className="flex flex-row items-center">
             <p className="text-stone-400">:</p>
           </div>
-          <SetTimerBox value="00" min="00" max="60" tag="sec" />
+          <SetTimerBox
+            min="00"
+            max="60"
+            tag="sec"
+            value={duration.seconds}
+            onChange={(value)=> setSeconds(Number(value))}
+          />
         </div>
-        <button className="bg-yellow-500 hover:bg-lime-400 text-sm rounded-md mt-2 py-1 px-2 text-stone-950 font-semibold max-w-fit self-end">
-          Add Timer
-        </button>
+        <TimerComponent />
       </div>
     </>
   );
