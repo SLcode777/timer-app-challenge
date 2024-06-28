@@ -5,12 +5,15 @@ export function SetTimerBox({ value, min, max, tag, onChange }) {
     event.target.select();
   };
 
+  const leadingZero = (num) => num.toString().padStart(2, '0')
+
+
   return (
     <>
       <div className="flex flex-col bg-stone-900 rounded-md p-2 items-center ">
         <input
           placeholder="00"
-          // value={value}
+          value={leadingZero(value)}
           onChange={(e) => onChange(e.target.value)}
           onFocus={handleFocus}
           type="number"
