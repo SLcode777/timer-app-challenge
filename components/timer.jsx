@@ -1,7 +1,7 @@
 "use client";
 
 import useTimersStore from "@/utils/timers-store";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Play, Pause, RotateCcw, X, Pencil } from "lucide-react";
 
 const TimerComponent = () => {
@@ -18,11 +18,16 @@ const TimerComponent = () => {
     initialDuration,
   } = useTimersStore();
 
+  const audioRefOver = useRef(null);
+
   useEffect(() => {
     const interval = setInterval(() => {
       timers.forEach((timer) => {
         if (timer.isRunning) {
           tickTimers(timer.id);
+        }
+        if (timer.duration === 1) {
+          audioRefOver.current.play();
         }
       });
     }, 1000);
@@ -39,9 +44,9 @@ const TimerComponent = () => {
     const newTimer = {
       id: Date.now(),
       initialisation: initialDuration,
-      initialHrs: initialDuration.hours,
-      initialMin: initialDuration.minutes,
-      initialSec: initialDuration.seconds,
+      initialHrs: duration.hours,
+      initialMin: duration.minutes,
+      initialSec: duration.seconds,
       hrs: duration.hours,
       min: duration.minutes,
       sec: duration.seconds,
@@ -76,6 +81,7 @@ const TimerComponent = () => {
   return (
     <>
       <div className="flex flex-col justify-center items-center">
+        <audio ref={audioRefOver} src="/timesup.wav" preload="auto"></audio>
         <button
           onClick={handleAddTimer}
           className="bg-yellow-500 hover:bg-lime-400 text-sm rounded-md mt-4 py-1 px-2 text-stone-950 font-semibold max-w-fit mb-10 self-end"
@@ -95,14 +101,14 @@ const TimerComponent = () => {
               ></input>
               <div className="flex flex-col items-center w-full text-center content-center p-2">
                 <div className="flex flex-row">
-                <div>{leadingZero(Math.floor(timer.duration / 3600))}</div>
-                <div className="mr-2">h</div>
-                <div>
-                  {leadingZero(Math.floor((timer.duration % 3600) / 60))}
-                </div>
-                <div className="mr-2">m</div>
-                {leadingZero(Math.floor(timer.duration % 60))}
-                <div>s</div>
+                  <div>{leadingZero(Math.floor(timer.duration / 3600))}</div>
+                  <div className="mr-2">h</div>
+                  <div>
+                    {leadingZero(Math.floor((timer.duration % 3600) / 60))}
+                  </div>
+                  <div className="mr-2">m</div>
+                  {leadingZero(Math.floor(timer.duration % 60))}
+                  <div>s</div>
                 </div>
               </div>
               <div className="flex flex-col items-center font-extralight text-sm">
