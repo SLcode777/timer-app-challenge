@@ -40,7 +40,6 @@ const TimerComponent = () => {
     const totalDurationInSeconds =
       duration.hours * 3600 + duration.minutes * 60 + duration.seconds * 1;
 
-
     const newTimer = {
       id: Date.now(),
       initialisation: initialDuration,
@@ -132,7 +131,7 @@ const TimerComponent = () => {
           onClick={handleAddTimer}
           className="bg-yellow-500 hover:bg-lime-400 text-sm rounded-md mt-8 py-1 px-2 text-stone-950 font-semibold w-64 mb-10 "
         >
-          AddTimer
+          Add Timer
         </button>
 
         <ul className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
