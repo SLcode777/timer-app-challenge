@@ -4,6 +4,7 @@ import useTimersStore from "@/utils/timers-store";
 import { useEffect, useRef, useState } from "react";
 import { Play, Pause, RotateCcw, X } from "lucide-react";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import { Toaster, toast } from "sonner";
 
 const TimerComponent = () => {
   const {
@@ -14,7 +15,7 @@ const TimerComponent = () => {
     tickTimers,
     setDurationInSeconds,
     pauseTimer,
-    unpauseTimer,
+    resumeTimer,
     resetTimer,
     initialDuration,
     setTimerName,
@@ -59,42 +60,68 @@ const TimerComponent = () => {
     setDurationInSeconds(totalDurationInSeconds);
     addTimer(newTimer);
     console.log("timer ajouté ! id : ", newTimer.id);
+    toast.success("A new amazing timer has been added !");
   };
 
-  const handleRemoveTimer = (timer) => {
+  const handleRemoveTimer = (timer, timerName) => {
     removeTimer(timer);
-    console.log("timer deleted", timer.id);
+
+    if (timerName === "timer !") {
+      toast.success("A timer has been deleted !");
+    } else {
+      toast.success(`timer ${timerName} has been deleted !`);
+    }
   };
 
-  const handlePauseTimer = (timerId) => {
-    console.log("timer paused", timerId);
+  const handlePauseTimer = (timerId, timerName) => {
     pauseTimer(timerId);
+
+    if (timerName === "timer !") {
+      toast.success("A timer has been paused !");
+    } else {
+      toast.success(`timer ${timerName} has been paused !`);
+    }
   };
 
-  const handleUnpauseTimer = (timerId) => {
-    console.log("timer unpaused", timerId);
-    unpauseTimer(timerId);
+  const handleResumeTimer = (timerId, timerName) => {
+    resumeTimer(timerId);
+
+    if (timerName === "timer !") {
+      toast.success("A timer has been resumed !");
+    } else {
+      toast.success(`timer ${timerName} has been resumed !`);
+    }
   };
 
-  const handleResetTimer = (timerId) => {
-    console.log("reset du timer", timerId);
+  const handleResetTimer = (timerId, timerName) => {
     resetTimer(timerId);
-    console.log("le timer a été reset", timerId);
+    if (timerName === "timer !") {
+      toast.success("A timer has been reset !");
+    } else {
+      toast.success(`timer ${timerName} has been reset !`);
+    }
   };
 
   const handleSetTimerName = (timerId, newName) => {
-    setTimerName(timerId, newName)
-  }
+    setTimerName(timerId, newName);
+  };
+
+  const handleTimeOver = (timerName) => {
+    if (timerName === "timer !") {
+      toast.success("A timer is over !");
+    } else {
+      toast.success(`timer ${timerName} is over !`);
+    }
+  };
 
   const leadingZero = (num) => num.toString().padStart(2, "0");
 
   const [key, setKey] = useState(0); // pour gérer le reset du timer (obligatoire avec react-countdown-circle-timer)
 
-
-
   return (
     <>
       <div className="flex flex-col justify-center items-center">
+        <Toaster position="top-center" />
         <audio ref={audioRefOver} src="/timesup.wav" preload="auto"></audio>
         <button
           onClick={handleAddTimer}
@@ -127,6 +154,7 @@ const TimerComponent = () => {
                   trailColor="#57534e"
                   onComplete={() => {
                     audioRefOver.current.play();
+                    handleTimeOver(timer.name);
                     return { shouldRepeat: false };
                   }}
                 >
@@ -135,7 +163,9 @@ const TimerComponent = () => {
                       <input
                         placeholder={timer.name}
                         className="flex flex-col w-full border-b border-stone-600 mb-4 max-w-sm italic text-center bg-transparent text-sm placeholder:text-stone-400 text-yellow-400/75 focus:outline-none"
-                        onChange={(e) => handleSetTimerName(timer.id, e.target.value)}
+                        onChange={(e) =>
+                          handleSetTimerName(timer.id, e.target.value)
+                        }
                       ></input>
                       <div className="flex flex-row">
                         <div className="text-2xl">
@@ -159,7 +189,7 @@ const TimerComponent = () => {
                           size={32}
                           color="#991b1b"
                           className="border border-red-600/75 rounded-full p-2 "
-                          onClick={() => handleRemoveTimer(timer)}
+                          onClick={() => handleRemoveTimer(timer, timer.name)}
                         />
                         <div>
                           {timer.duration <= 0 ? (
@@ -167,9 +197,9 @@ const TimerComponent = () => {
                               size={32}
                               color="#eab308"
                               className="border border-yellow-400/75 rounded-full p-2 "
-                              onClick={() => {setKey((prevKey) => prevKey + 1);
-                                handleResetTimer(timer.id);
-                              
+                              onClick={() => {
+                                setKey((prevKey) => prevKey + 1);
+                                handleResetTimer(timer.id, timer.name);
                               }}
                             />
                           ) : timer.isRunning ? (
@@ -177,14 +207,18 @@ const TimerComponent = () => {
                               size={32}
                               color="#d97706"
                               className="border border-amber-600 rounded-full p-2 "
-                              onClick={() => handlePauseTimer(timer.id)}
+                              onClick={() =>
+                                handlePauseTimer(timer.id, timer.name)
+                              }
                             />
                           ) : (
                             <Play
                               size={32}
                               color="#4d7c0f"
                               className="border border-lime-400/50 rounded-full p-2 "
-                              onClick={() => handleUnpauseTimer(timer.id)}
+                              onClick={() =>
+                                handleResumeTimer(timer.id, timer.name)
+                              }
                             />
                           )}
                         </div>

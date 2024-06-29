@@ -77,7 +77,7 @@ const useTimersStore = create((set, get) => ({
     }));
   },
 
-  unpauseTimer: (id) => {
+  resumeTimer: (id) => {
     set((state) => ({
       timers: state.timers.map((timer) =>
         timer.id === id ? { ...timer, isRunning: true } : timer
