@@ -88,7 +88,9 @@ const TimerComponent = () => {
 
   const leadingZero = (num) => num.toString().padStart(2, "0");
 
-  const [key, setKey] = useState(0);
+  const [key, setKey] = useState(0); // pour gérer le reset du timer (obligatoire avec react-countdown-circle-timer)
+
+
 
   return (
     <>
