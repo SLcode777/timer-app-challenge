@@ -1,7 +1,6 @@
 "use client";
 
 import { SetTimerBox } from "./set-timer-box.jsx";
-import TimerComponent from "./timer";
 import useTimersStore from "@/utils/timers-store";
 
 export function SetTimer() {
@@ -41,7 +40,7 @@ export function SetTimer() {
             onChange={(value)=> setSeconds(Number(value))}
           />
         </div>
-        <TimerComponent />
+        
       </div>
     </>
   );

@@ -12,8 +12,9 @@ export default function Home() {
       <section>
         <SetTimer />
       </section>
-      <section className="mt-10">
-      
+      <section >
+
+      <TimerComponent />
       </section>
     </main>
   );

@@ -4,7 +4,7 @@ const useTimersStore = create((set, get) => ({
   timers: [],
   duration: { hours: 0, minutes: 0, seconds: 0 },
   durationInSeconds: 0,
-  initialDuration: {hours: 0, minutes: 0, seconds: 0},
+  initialDuration: { hours: 0, minutes: 0, seconds: 0 },
 
   setHours: (hours) => {
     set((state) => ({ duration: { ...state.duration, hours } }));
@@ -24,14 +24,20 @@ const useTimersStore = create((set, get) => ({
     set(() => ({
       durationInSeconds: totalSeconds,
     }));
-    console.log("setTotalDuration log", totalSeconds);
+  },
+
+  setTimerName: (id, newname) => {
+    set((state) => ({
+      timers: state.timers.map((timer) =>
+        timer.id === id ? { ...timer, name: newname } : timer
+      ),
+    }));
   },
 
   addTimer: (timer) => {
     set((state) => ({
       timers: [...state.timers, { ...timer, initialDuration: timer.duration }],
     }));
-    
   },
 
   updateTimer: (id, newTime) => {
@@ -71,7 +77,7 @@ const useTimersStore = create((set, get) => ({
     }));
   },
 
-  restartTimer: (id) => {
+  unpauseTimer: (id) => {
     set((state) => ({
       timers: state.timers.map((timer) =>
         timer.id === id ? { ...timer, isRunning: true } : timer

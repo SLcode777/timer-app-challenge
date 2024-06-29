@@ -1,8 +1,9 @@
 "use client";
 
 import useTimersStore from "@/utils/timers-store";
-import { useEffect, useRef } from "react";
-import { Play, Pause, RotateCcw, X, Pencil } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Play, Pause, RotateCcw, X } from "lucide-react";
+import { CountdownCircleTimer } from "react-countdown-circle-timer";
 
 const TimerComponent = () => {
   const {
@@ -13,9 +14,10 @@ const TimerComponent = () => {
     tickTimers,
     setDurationInSeconds,
     pauseTimer,
-    restartTimer,
+    unpauseTimer,
     resetTimer,
     initialDuration,
+    setTimerName,
   } = useTimersStore();
 
   const audioRefOver = useRef(null);
@@ -25,9 +27,6 @@ const TimerComponent = () => {
       timers.forEach((timer) => {
         if (timer.isRunning) {
           tickTimers(timer.id);
-        }
-        if (timer.duration === 1) {
-          audioRefOver.current.play();
         }
       });
     }, 1000);
@@ -50,33 +49,46 @@ const TimerComponent = () => {
       hrs: duration.hours,
       min: duration.minutes,
       sec: duration.seconds,
-      name: "je suis un FAKE timer",
+      name: "timer !",
       isRunning: true,
       startTime: Date.now(),
       duration: totalDurationInSeconds,
     };
 
+    console.log("timer duration in seconds : ", newTimer.duration);
     setDurationInSeconds(totalDurationInSeconds);
     addTimer(newTimer);
+    console.log("timer ajouté ! id : ", newTimer.id);
   };
 
   const handleRemoveTimer = (timer) => {
     removeTimer(timer);
+    console.log("timer deleted", timer.id);
   };
 
   const handlePauseTimer = (timerId) => {
+    console.log("timer paused", timerId);
     pauseTimer(timerId);
   };
 
-  const handleRestartTimer = (timerId) => {
-    restartTimer(timerId);
+  const handleUnpauseTimer = (timerId) => {
+    console.log("timer unpaused", timerId);
+    unpauseTimer(timerId);
   };
 
   const handleResetTimer = (timerId) => {
+    console.log("reset du timer", timerId);
     resetTimer(timerId);
+    console.log("le timer a été reset", timerId);
   };
 
+  const handleSetTimerName = (timerId, newName) => {
+    setTimerName(timerId, newName)
+  }
+
   const leadingZero = (num) => num.toString().padStart(2, "0");
+
+  const [key, setKey] = useState(0);
 
   return (
     <>
@@ -88,65 +100,96 @@ const TimerComponent = () => {
         >
           AddTimer
         </button>
+
         <ul className="w-64">
           {timers.map((timer) => (
             <li
-              className="flex flex-col justify-center text-stone-300 mb-4 h-64 border border-1 border-yellow-400 rounded-full p-4 px-8"
+              className="flex flex-col justify-center text-stone-300 mb-4 h-64  rounded-full p-4 px-8"
               key={timer.id}
             >
-              <div className="flex flex-col items-center text-center gap-4"></div>
-              <input
-                placeholder="timer !"
-                className="flex flex-col w-full border-b border-stone-600 mb-4 max-w-sm italic text-center bg-transparent text-sm placeholder:text-stone-400 text-yellow-400/75 focus:outline-none"
-              ></input>
-              <div className="flex flex-col items-center w-full text-center content-center p-2">
-                <div className="flex flex-row">
-                  <div>{leadingZero(Math.floor(timer.duration / 3600))}</div>
-                  <div className="mr-2">h</div>
-                  <div>
-                    {leadingZero(Math.floor((timer.duration % 3600) / 60))}
-                  </div>
-                  <div className="mr-2">m</div>
-                  {leadingZero(Math.floor(timer.duration % 60))}
-                  <div>s</div>
-                </div>
-              </div>
-              <div className="flex flex-col items-center font-extralight text-sm">
-                {leadingZero(timer.initialHrs)}:{leadingZero(timer.initialMin)}:
-                {leadingZero(timer.initialSec)}
-              </div>
-
-              <div className="flex flex-row justify-between px-10 mt-4">
-                <X
-                  size={32}
-                  color="#991b1b"
-                  className="border border-red-600/75 rounded-full p-2 "
-                  onClick={() => handleRemoveTimer(timer)}
-                />
-                <div>
-                  {timer.duration <= 0 ? (
-                    <RotateCcw
-                      size={32}
-                      color="#eab308"
-                      className="border border-yellow-400/75 rounded-full p-2 "
-                      onClick={() => handleResetTimer(timer.id)}
-                    />
-                  ) : timer.isRunning ? (
-                    <Pause
-                      size={32}
-                      color="#d97706"
-                      className="border border-amber-600 rounded-full p-2 "
-                      onClick={() => handlePauseTimer(timer.id)}
-                    />
-                  ) : (
-                    <Play
-                      size={32}
-                      color="#4d7c0f"
-                      className="border border-lime-400/50 rounded-full p-2 "
-                      onClick={() => handleRestartTimer(timer.id)}
-                    />
+              <div className="flex flex-col items-center text-center gap-4">
+                <CountdownCircleTimer
+                  key={key}
+                  isPlaying={timer.isRunning}
+                  duration={
+                    timer.initialHrs * 3600 +
+                    timer.initialMin * 60 +
+                    timer.initialSec
+                  }
+                  initialRemainingTime={timer.duration}
+                  colors={["#F7B801"]}
+                  size={250}
+                  strokeWidth={3}
+                  strokeLinecap="butt"
+                  trailStrokeWidth={1}
+                  trailColor="#57534e"
+                  onComplete={() => {
+                    audioRefOver.current.play();
+                    return { shouldRepeat: false };
+                  }}
+                >
+                  {({ remainingTime }) => (
+                    <div className="flex flex-col items-center">
+                      <input
+                        placeholder={timer.name}
+                        className="flex flex-col w-full border-b border-stone-600 mb-4 max-w-sm italic text-center bg-transparent text-sm placeholder:text-stone-400 text-yellow-400/75 focus:outline-none"
+                        onChange={(e) => handleSetTimerName(timer.id, e.target.value)}
+                      ></input>
+                      <div className="flex flex-row">
+                        <div className="text-2xl">
+                          {leadingZero(Math.floor(remainingTime / 3600))}h
+                        </div>
+                        <div className="text-2xl">
+                          {leadingZero(Math.floor((remainingTime % 3600) / 60))}
+                          m
+                        </div>
+                        <div className="text-2xl">
+                          {leadingZero(remainingTime % 60)}s
+                        </div>
+                      </div>
+                      <div className="flex flex-col mt-2 items-center font-extralight text-sm">
+                        {leadingZero(timer.initialHrs)}:
+                        {leadingZero(timer.initialMin)}:
+                        {leadingZero(timer.initialSec)}
+                      </div>
+                      <div className="flex flex-row gap-20 mt-8">
+                        <X
+                          size={32}
+                          color="#991b1b"
+                          className="border border-red-600/75 rounded-full p-2 "
+                          onClick={() => handleRemoveTimer(timer)}
+                        />
+                        <div>
+                          {timer.duration <= 0 ? (
+                            <RotateCcw
+                              size={32}
+                              color="#eab308"
+                              className="border border-yellow-400/75 rounded-full p-2 "
+                              onClick={() => {setKey((prevKey) => prevKey + 1);
+                                handleResetTimer(timer.id);
+                              
+                              }}
+                            />
+                          ) : timer.isRunning ? (
+                            <Pause
+                              size={32}
+                              color="#d97706"
+                              className="border border-amber-600 rounded-full p-2 "
+                              onClick={() => handlePauseTimer(timer.id)}
+                            />
+                          ) : (
+                            <Play
+                              size={32}
+                              color="#4d7c0f"
+                              className="border border-lime-400/50 rounded-full p-2 "
+                              onClick={() => handleUnpauseTimer(timer.id)}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   )}
-                </div>
+                </CountdownCircleTimer>
               </div>
             </li>
           ))}
