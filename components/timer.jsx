@@ -22,6 +22,7 @@ const TimerComponent = () => {
   } = useTimersStore();
 
   const audioRefOver = useRef(null);
+  const audioRefRunning = useRef(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,7 +40,6 @@ const TimerComponent = () => {
     const totalDurationInSeconds =
       duration.hours * 3600 + duration.minutes * 60 + duration.seconds * 1;
 
-    console.log("totalDurationInSeconds log : ", totalDurationInSeconds);
 
     const newTimer = {
       id: Date.now(),
@@ -56,10 +56,9 @@ const TimerComponent = () => {
       duration: totalDurationInSeconds,
     };
 
-    console.log("timer duration in seconds : ", newTimer.duration);
     setDurationInSeconds(totalDurationInSeconds);
     addTimer(newTimer);
-    console.log("timer ajouté ! id : ", newTimer.id);
+    audioRefRunning.current.play();
     toast.success("A new amazing timer has been added !");
   };
 
@@ -85,7 +84,7 @@ const TimerComponent = () => {
 
   const handleResumeTimer = (timerId, timerName) => {
     resumeTimer(timerId);
-
+    audioRefRunning.current.play();
     if (timerName === "timer !") {
       toast.success("A timer has been resumed !");
     } else {
@@ -95,6 +94,7 @@ const TimerComponent = () => {
 
   const handleResetTimer = (timerId, timerName) => {
     resetTimer(timerId);
+    audioRefRunning.current.play();
     if (timerName === "timer !") {
       toast.success("A timer has been reset !");
     } else {
@@ -123,17 +123,22 @@ const TimerComponent = () => {
       <div className="flex flex-col justify-center items-center">
         <Toaster position="top-center" />
         <audio ref={audioRefOver} src="/timesup.wav" preload="auto"></audio>
+        <audio
+          ref={audioRefRunning}
+          src="/timesrunning.wav"
+          preload="auto"
+        ></audio>
         <button
           onClick={handleAddTimer}
-          className="bg-yellow-500 hover:bg-lime-400 text-sm rounded-md mt-4 py-1 px-2 text-stone-950 font-semibold max-w-fit mb-10 self-end"
+          className="bg-yellow-500 hover:bg-lime-400 text-sm rounded-md mt-8 py-1 px-2 text-stone-950 font-semibold w-64 mb-10 "
         >
           AddTimer
         </button>
 
-        <ul className="w-64">
+        <ul className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
           {timers.map((timer) => (
             <li
-              className="flex flex-col justify-center text-stone-300 mb-4 h-64  rounded-full p-4 px-8"
+              className="flex flex-col justify-center text-stone-300 mb-4 h-64  rounded-full p-4 "
               key={timer.id}
             >
               <div className="flex flex-col items-center text-center gap-4">
